@@ -165,7 +165,7 @@
 <script>
 const SUPABASE_URL = 'https://uyqjtwwpyifdboayvzfn.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_yZA9Q2W_clcJjTsQ5az7rQ_X5KvcsLo';
-const supabaseClient = (window.supabase && SUPABASE_URL.startsWith('https://uyqjtwwpyifdboayvzfn.supabase.co') && !SUPABASE_URL.includes('https://uyqjtwwpyifdboayvzfn.supabase.co') && !SUPABASE_ANON_KEY.includes('sb_publishable_yZA9Q2W_clcJjTsQ5az7rQ_X5KvcsLo')) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const supabaseClient = (window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('https://uyqjtwwpyifdboayvzfn.supabase.co') && !SUPABASE_ANON_KEY.includes('sb_publishable_yZA9Q2W_clcJjTsQ5az7rQ_X5KvcsLo')) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const DEFAULT_CATEGORIES=['Alat ukur','Alat optik','Alat praktikum','Bahan kimia','Bahan habis pakai','Model dan media'];
 const SEED=[
  {id:1,name:'Mikroskop monokuler',category:'Alat optik',kind:'Alat',quantity:8,unit:'Unit',condition:'Baik',location:'Lemari alat optik',notes:'Simpan dengan penutup debu',updated:Date.now()},
