@@ -156,7 +156,8 @@
       <div class="form-group"><label>Kondisi *</label><select id="condition" class="field"><option>Baik</option><option>Perlu diperbaiki</option><option>Rusak</option></select></div>
       <div class="form-group"><label>Lokasi penyimpanan</label><input id="location" class="field" placeholder="Contoh: Lemari kaca A"></div>
       <div class="form-group full"><label>Keterangan</label><textarea id="notes" class="field" rows="3" placeholder="Catatan tambahan (opsional)"></textarea></div>
-    </div><p class="help">Kolom bertanda * wajib diisi. Data tersimpan di database online.</p></div>
+    </div><p class="help">Kolom bertanda * wajib diisi. Data tersimpan di database online.</p>
+    <div id="itemSaveError" class="login-error" role="alert" style="display:none;margin:0 0 12px"></div></div>
     <div class="modal-foot"><button type="button" class="btn" onclick="closeModal()">Batal</button><button type="submit" class="btn btn-primary">Simpan data</button></div>
   </form>
 </div></div>
@@ -212,7 +213,26 @@ function openModal(id=null){
 }
 function closeModal(){modalBackdrop.classList.remove('show')}
 function editItem(id){openModal(id)}
-itemForm.addEventListener('submit',e=>{e.preventDefault();let id=Number(itemId.value),old=items.find(x=>x.id===id);let obj={id:id||Date.now(),name:name.value.trim(),category:category.value,kind:kind.value,quantity:Number(quantity.value),unit:unit.value,condition:condition.value,location:location.value.trim(),notes:notes.value.trim(),updated:Date.now()};if(old)items=items.map(x=>x.id===id?obj:x);else items.unshift(obj);save().catch(e=>toast('Gagal menyimpan: '+e.message));closeModal();renderAll();toast(old?'Data inventaris diperbarui.':'Inventaris berhasil ditambahkan.')});
+itemForm.addEventListener('submit',async e=>{
+ e.preventDefault();
+ const submitButton=itemForm.querySelector('button[type="submit"]');
+ const errorBox=document.getElementById('itemSaveError');
+ const originalText=submitButton.textContent;
+ errorBox.style.display='none';errorBox.textContent='';submitButton.disabled=true;submitButton.textContent='Menyimpan…';
+ try{
+  if(!supabaseClient)throw new Error('Koneksi Supabase belum aktif. Periksa URL dan publishable key.');
+  const {data:{session}}=await supabaseClient.auth.getSession();
+  if(!session)throw new Error('Sesi masuk tidak ditemukan. Keluar lalu masuk kembali.');
+  const id=Number(itemId.value),old=items.find(x=>x.id===id);
+  const obj={id:id||Date.now(),name:name.value.trim(),category:category.value,kind:kind.value,quantity:Number(quantity.value),unit:unit.value,condition:condition.value,location:location.value.trim(),notes:notes.value.trim(),updated:Date.now()};
+  const {error}=await supabaseClient.from('inventory_items').upsert({id:obj.id,name:obj.name,category:obj.category,kind:obj.kind,quantity:obj.quantity,unit:obj.unit,condition:obj.condition,location:obj.location,notes:obj.notes,updated:obj.updated});
+  if(error)throw error;
+  if(old)items=items.map(x=>x.id===id?obj:x);else items.unshift(obj);
+  closeModal();renderAll();toast(old?'Data inventaris berhasil diperbarui.':'Inventaris berhasil disimpan ke database.');
+ }catch(error){
+  const message=error?.message||String(error);errorBox.textContent='Gagal menyimpan: '+message;errorBox.style.display='block';toast('Gagal menyimpan. Periksa pesan pada formulir.');console.error('LabData save failed:',error);
+ }finally{submitButton.disabled=false;submitButton.textContent=originalText;}
+});
 function deleteItem(id){let x=items.find(a=>a.id===id);if(!x||!confirm(`Hapus "${x.name}" dari inventaris?`))return;items=items.filter(a=>a.id!==id);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Data inventaris dihapus.')}
 function addCategory(){let v=prompt('Masukkan nama kategori baru:');if(!v)return;v=v.trim();if(!v)return;if(categories.some(c=>c.toLowerCase()===v.toLowerCase()))return toast('Kategori sudah tersedia.');categories.push(v);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Kategori ditambahkan.')}
 function renameCategory(old){let v=prompt('Ubah nama kategori:',old);if(!v||!v.trim()||v.trim()===old)return;v=v.trim();if(categories.includes(v))return toast('Nama kategori sudah tersedia.');categories=categories.map(c=>c===old?v:c);items=items.map(x=>x.category===old?{...x,category:v,updated:Date.now()}:x);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Kategori diperbarui.')}
@@ -252,4 +272,5 @@ refreshSelects();renderAll();
 </script>
 </body>
 </html>
+
 
