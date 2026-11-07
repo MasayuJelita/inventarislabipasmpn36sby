@@ -225,7 +225,7 @@ itemForm.addEventListener('submit',async e=>{
   const {data:{session}}=await supabaseClient.auth.getSession();
   if(!session)throw new Error('Sesi masuk tidak ditemukan. Keluar lalu masuk kembali.');
   const id=Number(itemId.value),old=items.find(x=>x.id===id);
-  const obj={id:id||Date.now(),name:name.value.trim(),category:category.value,kind:kind.value,quantity:Number(quantity.value),unit:unit.value,condition:condition.value,location:location.value.trim(),notes:notes.value.trim(),updated:Date.now()};
+  const obj={id:id||Date.now(),name:document.getElementById('name').value.trim(),category:document.getElementById('category').value,kind:document.getElementById('kind').value,quantity:Number(document.getElementById('quantity').value),unit:document.getElementById('unit').value,condition:document.getElementById('condition').value,location:document.getElementById('location').value.trim(),notes:document.getElementById('notes').value.trim(),updated:Date.now()};
   const {error}=await supabaseClient.from('inventory_items').upsert({id:obj.id,name:obj.name,category:obj.category,kind:obj.kind,quantity:obj.quantity,unit:obj.unit,condition:obj.condition,location:obj.location,notes:obj.notes,updated:obj.updated});
   if(error)throw error;
   if(old)items=items.map(x=>x.id===id?obj:x);else items.unshift(obj);
