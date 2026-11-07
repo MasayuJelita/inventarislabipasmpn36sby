@@ -50,8 +50,8 @@
       <div class="login-error" id="loginError">Username atau password salah. Silakan coba lagi.</div>
       <form id="loginForm">
         <div class="form-group">
-          <label for="loginUsername">Username</label>
-          <input class="field" id="loginUsername" autocomplete="username" placeholder="Masukkan username" required>
+          <label for="loginEmail">Email</label>
+          <input class="field" id="loginEmail" type="email" autocomplete="email" placeholder="Masukkan email" required>
         </div>
         <div class="form-group">
           <label for="loginPassword">Password</label>
@@ -64,17 +64,17 @@
     <!-- FORM REGISTER -->
     <div id="registerSection" class="hide">
       <h1>Buat Akun Baru</h1>
-      <p class="intro">Daftarkan akun untuk mengakses sistem inventaris.</p>
+      <p class="intro">Daftarkan akun dengan email aktif agar bisa masuk dari perangkat lain.</p>
       <div class="login-error" id="regError"></div>
-      <div class="login-success" id="regSuccess">Akun berhasil dibuat! Silakan masuk.</div>
+      <div class="login-success" id="regSuccess"></div>
       <form id="registerForm">
         <div class="form-group">
           <label for="regFullName">Nama Lengkap</label>
           <input class="field" id="regFullName" placeholder="Contoh: Ahmad Laboran" required>
         </div>
         <div class="form-group">
-          <label for="regUsername">Username</label>
-          <input class="field" id="regUsername" autocomplete="username" placeholder="Buat username baru" required>
+          <label for="regEmail">Email</label>
+          <input class="field" id="regEmail" type="email" autocomplete="email" placeholder="Masukkan email aktif" required>
         </div>
         <div class="form-group">
           <label for="regPassword">Password</label>
@@ -139,7 +139,7 @@
       <div class="pagehead"><div><h1>Laporan Inventaris</h1><p>Rekap data inventaris keseluruhan.</p></div><button class="btn" onclick="exportCSV()">↓ Unduh data CSV</button></div>
       <div class="report-cards" id="reportCards"></div>
       <div class="panel" style="margin-top:20px"><div class="panel-head"><h2>Rekap inventaris</h2></div><div class="table-wrap"><table><thead><tr><th>Nama barang</th><th>Kategori</th><th>Jumlah</th><th>Kondisi</th><th>Lokasi</th><th>Terakhir diperbarui</th></tr></thead><tbody id="reportRows"></tbody></table></div></div>
-      <p class="footnote">Catatan: laporan ini merupakan rekap data yang tersimpan pada perangkat/browser yang sedang digunakan.</p>
+      <p class="footnote">Catatan: laporan ini menampilkan data inventaris online yang dibagikan kepada pengguna terdaftar.</p>
     </section>
   </div>
 </main>
@@ -156,12 +156,16 @@
       <div class="form-group"><label>Kondisi *</label><select id="condition" class="field"><option>Baik</option><option>Perlu diperbaiki</option><option>Rusak</option></select></div>
       <div class="form-group"><label>Lokasi penyimpanan</label><input id="location" class="field" placeholder="Contoh: Lemari kaca A"></div>
       <div class="form-group full"><label>Keterangan</label><textarea id="notes" class="field" rows="3" placeholder="Catatan tambahan (opsional)"></textarea></div>
-    </div><p class="help">Kolom bertanda * wajib diisi. Data disimpan di browser perangkat ini.</p></div>
+    </div><p class="help">Kolom bertanda * wajib diisi. Data tersimpan di database online.</p></div>
     <div class="modal-foot"><button type="button" class="btn" onclick="closeModal()">Batal</button><button type="submit" class="btn btn-primary">Simpan data</button></div>
   </form>
 </div></div>
 <div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
+const SUPABASE_URL = 'uyqjtwwpyifdboayvzfn';
+const SUPABASE_ANON_KEY = 'uyqjtwwpyifdboayvzfn';
+const supabaseClient = (window.supabase && SUPABASE_URL.startsWith('https://') && !SUPABASE_URL.includes('ISI_') && !SUPABASE_ANON_KEY.includes('ISI_')) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const DEFAULT_CATEGORIES=['Alat ukur','Alat optik','Alat praktikum','Bahan kimia','Bahan habis pakai','Model dan media'];
 const SEED=[
  {id:1,name:'Mikroskop monokuler',category:'Alat optik',kind:'Alat',quantity:8,unit:'Unit',condition:'Baik',location:'Lemari alat optik',notes:'Simpan dengan penutup debu',updated:Date.now()},
@@ -170,9 +174,16 @@ const SEED=[
  {id:4,name:'Larutan indikator universal',category:'Bahan kimia',kind:'Bahan',quantity:6,unit:'Botol',condition:'Baik',location:'Lemari bahan kimia',notes:'Periksa tanggal kedaluwarsa',updated:Date.now()},
  {id:5,name:'Preparat awetan',category:'Alat praktikum',kind:'Alat',quantity:20,unit:'Set',condition:'Rusak',location:'Lemari preparat',notes:'Beberapa preparat retak',updated:Date.now()}
 ];
-let items=JSON.parse(localStorage.getItem('labtrack_items')||'null')||SEED;
-let categories=JSON.parse(localStorage.getItem('labtrack_categories')||'null')||DEFAULT_CATEGORIES;
-function save(){localStorage.setItem('labtrack_items',JSON.stringify(items));localStorage.setItem('labtrack_categories',JSON.stringify(categories))}
+let items=[];
+let categories=DEFAULT_CATEGORIES.slice();
+async function save(){
+ if(!supabaseClient) return toast('Database belum dikonfigurasi.');
+ const rows=items.map(x=>({id:x.id,name:x.name,category:x.category,kind:x.kind,quantity:x.quantity,unit:x.unit,condition:x.condition,location:x.location||'',notes:x.notes||'',updated:x.updated||Date.now()}));
+ const {error:itemError}=await supabaseClient.from('inventory_items').upsert(rows); if(itemError) throw itemError;
+ const keep=items.map(x=>x.id); if(keep.length){const {error}=await supabaseClient.from('inventory_items').delete().not('id','in',`(${keep.join(',')})`);if(error)throw error}else{const {error}=await supabaseClient.from('inventory_items').delete().neq('id',0);if(error)throw error}
+ const cats=categories.map(name=>({name})); if(cats.length){const {error}=await supabaseClient.from('inventory_categories').upsert(cats);if(error)throw error;const names=categories.map(x=>`"${x.replaceAll('"','\"')}"`).join(',');const {error:delError}=await supabaseClient.from('inventory_categories').delete().not('name','in',`(${names})`);if(delError)throw delError}
+ else {const {error}=await supabaseClient.from('inventory_categories').delete().neq('name','');if(error)throw error}
+}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function badge(c){return `<span class="badge ${c==='Baik'?'good':c==='Rusak'?'bad':c==='Perlu diperbaiki'?'warn':'neutral'}">${esc(c)}</span>`}
 function showPage(p){document.querySelectorAll('main section').forEach(s=>s.classList.add('hide'));document.getElementById(p+'Page').classList.remove('hide');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.getElementById('crumb').textContent={dashboard:'Dashboard',inventory:'Data Inventaris',categories:'Kategori',reports:'Laporan'}[p];document.getElementById('sidebar').classList.remove('open');if(p==='dashboard')renderDashboard();if(p==='inventory')renderInventory();if(p==='categories')renderCategories();if(p==='reports')renderReports()}
@@ -201,11 +212,11 @@ function openModal(id=null){
 }
 function closeModal(){modalBackdrop.classList.remove('show')}
 function editItem(id){openModal(id)}
-itemForm.addEventListener('submit',e=>{e.preventDefault();let id=Number(itemId.value),old=items.find(x=>x.id===id);let obj={id:id||Date.now(),name:name.value.trim(),category:category.value,kind:kind.value,quantity:Number(quantity.value),unit:unit.value,condition:condition.value,location:location.value.trim(),notes:notes.value.trim(),updated:Date.now()};if(old)items=items.map(x=>x.id===id?obj:x);else items.unshift(obj);save();closeModal();renderAll();toast(old?'Data inventaris diperbarui.':'Inventaris berhasil ditambahkan.')});
-function deleteItem(id){let x=items.find(a=>a.id===id);if(!x||!confirm(`Hapus "${x.name}" dari inventaris?`))return;items=items.filter(a=>a.id!==id);save();renderAll();toast('Data inventaris dihapus.')}
-function addCategory(){let v=prompt('Masukkan nama kategori baru:');if(!v)return;v=v.trim();if(!v)return;if(categories.some(c=>c.toLowerCase()===v.toLowerCase()))return toast('Kategori sudah tersedia.');categories.push(v);save();renderAll();toast('Kategori ditambahkan.')}
-function renameCategory(old){let v=prompt('Ubah nama kategori:',old);if(!v||!v.trim()||v.trim()===old)return;v=v.trim();if(categories.includes(v))return toast('Nama kategori sudah tersedia.');categories=categories.map(c=>c===old?v:c);items=items.map(x=>x.category===old?{...x,category:v,updated:Date.now()}:x);save();renderAll();toast('Kategori diperbarui.')}
-function removeCategory(c){if(items.some(x=>x.category===c))return alert('Kategori masih digunakan oleh inventaris. Pindahkan barang ke kategori lain terlebih dahulu.');if(confirm(`Hapus kategori "${c}"?`)){categories=categories.filter(x=>x!==c);save();renderAll()}}
+itemForm.addEventListener('submit',e=>{e.preventDefault();let id=Number(itemId.value),old=items.find(x=>x.id===id);let obj={id:id||Date.now(),name:name.value.trim(),category:category.value,kind:kind.value,quantity:Number(quantity.value),unit:unit.value,condition:condition.value,location:location.value.trim(),notes:notes.value.trim(),updated:Date.now()};if(old)items=items.map(x=>x.id===id?obj:x);else items.unshift(obj);save().catch(e=>toast('Gagal menyimpan: '+e.message));closeModal();renderAll();toast(old?'Data inventaris diperbarui.':'Inventaris berhasil ditambahkan.')});
+function deleteItem(id){let x=items.find(a=>a.id===id);if(!x||!confirm(`Hapus "${x.name}" dari inventaris?`))return;items=items.filter(a=>a.id!==id);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Data inventaris dihapus.')}
+function addCategory(){let v=prompt('Masukkan nama kategori baru:');if(!v)return;v=v.trim();if(!v)return;if(categories.some(c=>c.toLowerCase()===v.toLowerCase()))return toast('Kategori sudah tersedia.');categories.push(v);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Kategori ditambahkan.')}
+function renameCategory(old){let v=prompt('Ubah nama kategori:',old);if(!v||!v.trim()||v.trim()===old)return;v=v.trim();if(categories.includes(v))return toast('Nama kategori sudah tersedia.');categories=categories.map(c=>c===old?v:c);items=items.map(x=>x.category===old?{...x,category:v,updated:Date.now()}:x);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Kategori diperbarui.')}
+function removeCategory(c){if(items.some(x=>x.category===c))return alert('Kategori masih digunakan oleh inventaris. Pindahkan barang ke kategori lain terlebih dahulu.');if(confirm(`Hapus kategori "${c}"?`)){categories=categories.filter(x=>x!==c);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll()}}
 function renderCategories(){categoryRows.innerHTML=categories.map(c=>{let a=items.filter(x=>x.category===c);return `<tr><td><strong>${esc(c)}</strong></td><td>${a.length}</td><td>${a.reduce((s,x)=>s+Number(x.quantity),0)}</td><td><div class="actions"><button class="btn btn-sm" onclick="renameCategory('${esc(c).replace(/'/g,"\\'")}')">Ubah nama</button><button class="btn btn-sm btn-danger" onclick="removeCategory('${esc(c).replace(/'/g,"\\'")}')">Hapus</button></div></td></tr>`}).join('')}
 
 function renderReports(){
@@ -218,112 +229,26 @@ function exportCSV(){let rows=[['Nama barang','Kategori','Jenis','Jumlah','Satua
 function toast(t){let el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400)}
 function renderAll(){renderDashboard();renderInventory();renderCategories();renderReports()}
 
-// SYSTEM AUTENTIKASI DENGAN AKUN LOKAL
-const DEFAULT_USERS = [
-  { fullname: 'Laboran', username: 'laboran', password: 'labipa123' }
-];
-
-function getUsers() {
-  return JSON.parse(localStorage.getItem('labdata_users') || 'null') || DEFAULT_USERS;
+// LOGIN ONLINE DAN DATABASE BERSAMA (Supabase)
+const loginScreen=document.getElementById('loginScreen'), loginForm=document.getElementById('loginForm'), registerForm=document.getElementById('registerForm');
+const loginError=document.getElementById('loginError'),regError=document.getElementById('regError'),regSuccess=document.getElementById('regSuccess');
+function switchAuthTab(type){loginError.style.display='none';regError.style.display='none';regSuccess.style.display='none';document.getElementById('tabLogin').classList.toggle('active',type==='login');document.getElementById('tabRegister').classList.toggle('active',type==='register');document.getElementById('loginSection').classList.toggle('hide',type!=='login');document.getElementById('registerSection').classList.toggle('hide',type!=='register')}
+function showSignedIn(user){if(!user){loginScreen.style.display='flex';return}loginScreen.style.display='none';const full=user.user_metadata?.full_name||user.email||'Pengguna';document.getElementById('userNameDisplay').textContent=full;document.getElementById('userAvatar').textContent=full.charAt(0).toUpperCase()}
+async function loadCloudData(){
+ const [{data:remoteItems,error:itemError},{data:remoteCats,error:catError}]=await Promise.all([supabaseClient.from('inventory_items').select('*').order('updated',{ascending:false}),supabaseClient.from('inventory_categories').select('name').order('name')]);
+ if(itemError||catError)throw itemError||catError;
+ if(!remoteItems.length){
+   const localItems=JSON.parse(localStorage.getItem('labtrack_items')||'null');const localCats=JSON.parse(localStorage.getItem('labtrack_categories')||'null');
+   if(localItems?.length){items=localItems;categories=localCats||DEFAULT_CATEGORIES.slice();await save();localStorage.removeItem('labtrack_items');localStorage.removeItem('labtrack_categories');toast('Data dari perangkat ini dipindahkan ke database online.')}
+   else {items=[];categories=localCats?.length?localCats:(remoteCats?.length?remoteCats.map(x=>x.name):DEFAULT_CATEGORIES.slice());if(!remoteCats?.length){const {error}=await supabaseClient.from('inventory_categories').upsert(categories.map(name=>({name})));if(error)throw error}}
+ }else{items=remoteItems;categories=remoteCats?.length?remoteCats.map(x=>x.name):DEFAULT_CATEGORIES.slice()}
+ renderAll();
 }
-
-function saveUsers(users) {
-  localStorage.setItem('labdata_users', JSON.stringify(users));
-}
-
-const loginScreen = document.getElementById('loginScreen');
-const loginForm = document.getElementById('loginForm');
-const registerForm = document.getElementById('registerForm');
-const loginError = document.getElementById('loginError');
-const regError = document.getElementById('regError');
-const regSuccess = document.getElementById('regSuccess');
-
-function switchAuthTab(type) {
-  loginError.style.display = 'none';
-  regError.style.display = 'none';
-  regSuccess.style.display = 'none';
-  if (type === 'login') {
-    document.getElementById('tabLogin').classList.add('active');
-    document.getElementById('tabRegister').classList.remove('active');
-    document.getElementById('loginSection').classList.remove('hide');
-    document.getElementById('registerSection').classList.add('hide');
-  } else {
-    document.getElementById('tabRegister').classList.add('active');
-    document.getElementById('tabLogin').classList.remove('active');
-    document.getElementById('registerSection').classList.remove('hide');
-    document.getElementById('loginSection').classList.add('hide');
-  }
-}
-
-function checkLogin() {
-  const currentUser = JSON.parse(sessionStorage.getItem('labdata_user_session') || 'null');
-  if (currentUser) {
-    loginScreen.style.display = 'none';
-    document.getElementById('userNameDisplay').textContent = currentUser.fullname;
-    document.getElementById('userAvatar').textContent = currentUser.fullname.charAt(0).toUpperCase();
-  } else {
-    loginScreen.style.display = 'flex';
-  }
-}
-
-// LOGIKA LOGIN
-loginForm.addEventListener('submit', function(event) {
-  event.preventDefault();
-  const usernameInput = document.getElementById('loginUsername').value.trim();
-  const passwordInput = document.getElementById('loginPassword').value;
-  
-  const users = getUsers();
-  const matchedUser = users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
-  
-  if (matchedUser) {
-    sessionStorage.setItem('labdata_user_session', JSON.stringify(matchedUser));
-    loginError.style.display = 'none';
-    loginForm.reset();
-    checkLogin();
-  } else {
-    loginError.style.display = 'block';
-  }
-});
-
-// LOGIKA BUAT AKUN (REGISTRASI)
-registerForm.addEventListener('submit', function(event) {
-  event.preventDefault();
-  const fullname = document.getElementById('regFullName').value.trim();
-  const username = document.getElementById('regUsername').value.trim();
-  const password = document.getElementById('regPassword').value;
-
-  const users = getUsers();
-  const isExist = users.some(u => u.username.toLowerCase() === username.toLowerCase());
-
-  if (isExist) {
-    regError.textContent = 'Username sudah digunakan. Pilih username lain.';
-    regError.style.display = 'block';
-    regSuccess.style.display = 'none';
-    return;
-  }
-
-  users.push({ fullname, username, password });
-  saveUsers(users);
-
-  regError.style.display = 'none';
-  regSuccess.style.display = 'block';
-  registerForm.reset();
-
-  setTimeout(() => {
-    switchAuthTab('login');
-    document.getElementById('loginUsername').value = username;
-  }, 1500);
-});
-
-// LOGIKA LOGOUT
-document.getElementById('logoutBtn').addEventListener('click', function() {
-  sessionStorage.removeItem('labdata_user_session');
-  checkLogin();
-});
-
-checkLogin();
-refreshSelects();
-renderAll();
+loginForm.addEventListener('submit',async e=>{e.preventDefault();if(!supabaseClient){loginError.textContent='Database belum dikonfigurasi. Hubungkan proyek Supabase terlebih dahulu.';loginError.style.display='block';return}const {error}=await supabaseClient.auth.signInWithPassword({email:document.getElementById('loginEmail').value.trim(),password:document.getElementById('loginPassword').value});if(error){loginError.textContent='Email atau kata sandi tidak cocok.';loginError.style.display='block'}});
+registerForm.addEventListener('submit',async e=>{e.preventDefault();if(!supabaseClient){regError.textContent='Database belum dikonfigurasi. Hubungkan proyek Supabase terlebih dahulu.';regError.style.display='block';return}const {data,error}=await supabaseClient.auth.signUp({email:document.getElementById('regEmail').value.trim(),password:document.getElementById('regPassword').value,options:{data:{full_name:document.getElementById('regFullName').value.trim()}}});if(error){regError.textContent=error.message;regError.style.display='block';return}registerForm.reset();regSuccess.textContent=data.session?'Akun berhasil dibuat. Kamu sudah masuk.':'Akun dibuat. Cek email untuk konfirmasi, lalu masuk.';regSuccess.style.display='block';regError.style.display='none';});
+document.getElementById('logoutBtn').addEventListener('click',async()=>{await supabaseClient?.auth.signOut();showSignedIn(null)});
+if(supabaseClient){supabaseClient.auth.onAuthStateChange((_event,session)=>{showSignedIn(session?.user||null);if(session?.user)setTimeout(()=>loadCloudData().catch(e=>toast('Gagal memuat database: '+e.message)),0)});supabaseClient.auth.getSession().then(({data})=>showSignedIn(data.session?.user||null))}else{showSignedIn(null)}
+refreshSelects();renderAll();
 </script>
 </body>
 </html>
