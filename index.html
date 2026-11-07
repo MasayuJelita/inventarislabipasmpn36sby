@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LabData — Inventaris Laboratorium IPA</title>
+<style>
+:root{--navy:#172b4d;--navy2:#213b62;--green:#668b78;--green2:#e8f0eb;--bg:#f4f6f8;--ink:#263445;--muted:#7b8794;--line:#e6eaf0;--white:#fff;--red:#c75b5b;--amber:#c28a35;--shadow:0 8px 28px rgba(23,43,77,.07)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}button,input,select,textarea{font:inherit}button{cursor:pointer}.app{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:248px;background:var(--navy);color:#fff;padding:25px 17px;display:flex;flex-direction:column;z-index:5}.brand{display:flex;gap:12px;align-items:center;padding:0 9px 30px}.brand-logo{width:58px;height:58px;flex:0 0 58px;object-fit:contain;display:block}.login-brand .brand-logo{width:48px;height:48px;flex-basis:48px;border-radius:0;background:transparent}.brandmark{width:40px;height:40px;border-radius:12px;background:#789987;display:grid;place-items:center;font-size:21px}.brand-logo{width:58px;height:58px;flex:0 0 58px;object-fit:contain;display:block}.login-brand .brand-logo{width:48px;height:48px;flex-basis:48px;border-radius:0;background:transparent}.brand strong{font-size:16px;letter-spacing:.2px}.brand small{display:block;color:#b8c6d8;font-size:11px;margin-top:2px}.nav-label{font-size:10px;color:#94a7bf;text-transform:uppercase;letter-spacing:1.2px;padding:9px 12px}.nav{display:grid;gap:5px}.nav button{border:0;background:transparent;color:#c6d1df;text-align:left;padding:11px 13px;border-radius:9px;display:flex;align-items:center;gap:12px}.nav button:hover,.nav button.active{background:#2a456a;color:#fff}.nav .ico{width:19px;text-align:center;font-size:16px}.side-bottom{margin-top:auto;border-top:1px solid #344b6b;padding:17px 9px 0;color:#b7c4d5;font-size:11px}.main{margin-left:248px;min-height:100vh}.topbar{height:70px;background:#fff;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 34px;position:sticky;top:0;z-index:4}.crumb{font-size:13px;color:var(--muted)}.crumb b{color:var(--ink)}.user{display:flex;align-items:center;gap:10px}.avatar{width:34px;height:34px;border-radius:50%;background:var(--green2);color:var(--green);display:grid;place-items:center;font-weight:700}.user small{display:block;color:var(--muted);font-size:11px}.content{padding:30px 34px 50px;max-width:1500px;margin:auto}.pagehead{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}.pagehead h1{font-size:24px;margin:0 0 5px;color:var(--navy);letter-spacing:-.5px}.pagehead p{margin:0;color:var(--muted)}.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:8px;font-weight:600;display:inline-flex;align-items:center;gap:7px}.btn:hover{filter:brightness(.97)}.btn-primary{background:var(--green);border-color:var(--green);color:#fff}.btn-danger{color:var(--red);border-color:#f0dada}.btn-sm{padding:6px 9px;font-size:12px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:22px}.stat{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 19px;box-shadow:var(--shadow)}.stat-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:12px}.stat-icon{width:34px;height:34px;border-radius:10px;background:var(--green2);display:grid;place-items:center;font-size:17px}.stat strong{display:block;font-size:27px;color:var(--navy);margin-top:10px;line-height:1.2}.stat small{color:var(--muted);font-size:11px}.panel{background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px}.panel-head{padding:17px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;gap:12px}.panel-head h2{font-size:15px;margin:0;color:var(--navy)}.panel-body{padding:19px 20px}.split{display:grid;grid-template-columns:1.45fr 1fr;gap:18px}.bar-row{display:grid;grid-template-columns:115px 1fr 34px;align-items:center;gap:10px;margin:13px 0;font-size:12px}.bar-track{height:8px;background:#edf0f3;border-radius:20px;overflow:hidden}.bar-fill{height:100%;background:var(--green);border-radius:20px}.legend{display:flex;gap:15px;flex-wrap:wrap;color:var(--muted);font-size:11px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}.toolbar{padding:15px 18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line)}.field{border:1px solid #dfe5eb;border-radius:8px;padding:9px 11px;background:#fff;color:var(--ink);min-width:0}.field:focus{outline:2px solid #d6e5dc;border-color:var(--green)}.search{min-width:230px;flex:1}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{text-align:left;padding:12px 17px;border-bottom:1px solid #edf0f3;font-size:12px}th{font-size:10px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);background:#fbfcfd}td{color:#455365}td strong{color:var(--navy);font-weight:650}.badge{display:inline-flex;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:700}.good{background:#e7f2eb;color:#4d8062}.warn{background:#fff2df;color:#a87322}.bad{background:#fae9e9;color:#b44e4e}.neutral{background:#edf1f5;color:#667487}.actions{display:flex;gap:5px}.empty{text-align:center;color:var(--muted);padding:35px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.form-group{display:grid;gap:6px}.form-group.full{grid-column:1/-1}.form-group label{font-size:11px;font-weight:700;color:#526174}.form-group .field{width:100%}.help{color:var(--muted);font-size:11px}.modal-backdrop{position:fixed;inset:0;background:#14243c77;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal-backdrop.show{display:flex}.modal{width:min(620px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:14px;box-shadow:0 25px 70px #12223b55}.modal-head{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}.modal-head h2{font-size:17px;margin:0;color:var(--navy)}.modal-body{padding:20px 22px}.modal-foot{padding:15px 22px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px}.close{border:0;background:transparent;font-size:22px;color:var(--muted)}.report-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.report-card{border:1px solid var(--line);border-radius:10px;padding:15px}.report-card small{color:var(--muted)}.report-card strong{display:block;font-size:23px;color:var(--navy);margin-top:5px}.toast{position:fixed;right:22px;bottom:22px;background:var(--navy);color:white;padding:12px 17px;border-radius:9px;box-shadow:var(--shadow);opacity:0;transform:translateY(10px);transition:.2s;z-index:20;pointer-events:none}.toast.show{opacity:1;transform:translateY(0)}.mobile-menu{display:none}.footnote{color:var(--muted);font-size:11px;margin-top:12px}.hide{display:none!important}
+@media(max-width:1000px){.sidebar{width:215px}.main{margin-left:215px}.stats{grid-template-columns:repeat(2,1fr)}.split{grid-template-columns:1fr}}
+@media(max-width:700px){.sidebar{transform:translateX(-100%);transition:.2s;width:248px}.sidebar.open{transform:translateX(0)}.main{margin-left:0}.topbar{padding:0 17px;height:62px}.mobile-menu{display:inline-flex}.content{padding:22px 15px 35px}.pagehead{align-items:flex-start;flex-direction:column}.stats{gap:10px}.stat{padding:14px}.stat strong{font-size:23px}.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:auto}.report-cards{grid-template-columns:1fr}.user div:last-child{display:none}}
+
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#172b4d 0%,#29476b 55%,#668b78 100%);display:flex;align-items:center;justify-content:center;padding:20px;z-index:100}
+.login-card{width:min(420px,100%);background:#fff;border-radius:18px;padding:34px;box-shadow:0 24px 70px #0b1c344d}
+.login-brand{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.login-brand .brandmark{flex:0 0 44px}
+.login-card h1{font-size:23px;color:var(--navy);margin:0 0 5px}
+.login-card .intro{color:var(--muted);font-size:13px;margin:0 0 20px}
+.login-card .form-group{margin-bottom:15px}
+.login-card .field{width:100%;padding:11px 12px}
+.login-submit{width:100%;justify-content:center;padding:11px;margin-top:5px}
+.login-error{display:none;color:#b44e4e;background:#fae9e9;padding:9px 11px;border-radius:7px;font-size:12px;margin:0 0 13px}
+.login-success{display:none;color:#4d8062;background:#e7f2eb;padding:9px 11px;border-radius:7px;font-size:12px;margin:0 0 13px}
+.auth-tabs{display:flex;gap:10px;margin-bottom:20px;border-bottom:1px solid var(--line);padding-bottom:10px}
+.auth-tab{background:none;border:none;color:var(--muted);font-weight:600;font-size:13px;padding:6px 0;cursor:pointer;position:relative}
+.auth-tab.active{color:var(--navy)}
+.auth-tab.active::after{content:'';position:absolute;bottom:-11px;left:0;right:0;height:2px;background:var(--green);border-radius:2px}
+.logout-btn{border:0;background:transparent;color:#8a5960;font-size:11px;padding:4px 0;cursor:pointer}
+
+</style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-brand">
+      <img class="brand-logo" src="LOGO-SMP-36-transparent.png" alt="Logo SMP Negeri 36 Surabaya">
+      <div><strong style="color:#172b4d;font-size:17px">LabData</strong><small style="display:block;color:#7b8794;font-size:11px">Sistem Inventaris Laboratorium IPA</small></div>
+    </div>
+    
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Masuk</button>
+      <button type="button" class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Buat Akun</button>
+    </div>
+
+    <!-- FORM LOGIN -->
+    <div id="loginSection">
+      <h1>Selamat datang!</h1>
+      <p class="intro">Silakan masuk untuk mengelola inventaris laboratorium.</p>
+      <div class="login-error" id="loginError">Username atau password salah. Silakan coba lagi.</div>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="loginUsername">Username</label>
+          <input class="field" id="loginUsername" autocomplete="username" placeholder="Masukkan username" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input class="field" id="loginPassword" type="password" autocomplete="current-password" placeholder="Masukkan password" required>
+        </div>
+        <button class="btn btn-primary login-submit" type="submit">Masuk ke Dashboard →</button>
+      </form>
+    </div>
+
+    <!-- FORM REGISTER -->
+    <div id="registerSection" class="hide">
+      <h1>Buat Akun Baru</h1>
+      <p class="intro">Daftarkan akun untuk mengakses sistem inventaris.</p>
+      <div class="login-error" id="regError"></div>
+      <div class="login-success" id="regSuccess">Akun berhasil dibuat! Silakan masuk.</div>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="regFullName">Nama Lengkap</label>
+          <input class="field" id="regFullName" placeholder="Contoh: Ahmad Laboran" required>
+        </div>
+        <div class="form-group">
+          <label for="regUsername">Username</label>
+          <input class="field" id="regUsername" autocomplete="username" placeholder="Buat username baru" required>
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input class="field" id="regPassword" type="password" autocomplete="new-password" placeholder="Buat password" required>
+        </div>
+        <button class="btn btn-primary login-submit" type="submit">Daftarkan Akun →</button>
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+  <!-- Mengganti elemen brandmark dengan gambar logo -->
+  <img class="brand-logo" src="LOGO-SMP-36-transparent.png" alt="Logo SMP Negeri 36 Surabaya">
+  <div><strong>LabTrack</strong><small>Sistem Inventaris IPA</small></div>
+</div>
+  <div class="nav-label">Menu utama</div>
+  <nav class="nav">
+    <button class="active" data-page="dashboard"><span class="ico">▦</span>Dashboard</button>
+    <button data-page="inventory"><span class="ico">▤</span>Data Inventaris</button>
+    <button data-page="categories"><span class="ico">◈</span>Kategori</button>
+    <button data-page="reports"><span class="ico">▥</span>Laporan</button>
+  </nav>
+  <div class="side-bottom">Laboratorium IPA<br><b>SMP Negeri 36 Surabaya</b><br><br>© 2026 LabData</div>
+</aside>
+<main class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:12px"><button class="btn mobile-menu" id="menuBtn">☰</button><div class="crumb">Laboratorium IPA / <b id="crumb">Dashboard</b></div></div>
+    <div class="user"><div class="avatar" id="userAvatar">L</div><div><b id="userNameDisplay">Laboran</b><small>Administrator</small><button class="logout-btn" id="logoutBtn" type="button">Keluar ↗</button></div></div>
+  </header>
+  <div class="content">
+    <section id="dashboardPage">
+      <div class="pagehead"><div><h1>Dashboard</h1><p>Ringkasan kondisi dan pengelolaan inventaris laboratorium.</p></div><button class="btn btn-primary" onclick="openModal()">＋ Tambah inventaris</button></div>
+      <div class="stats">
+        <div class="stat"><div class="stat-top">Total jenis inventaris <span class="stat-icon">▤</span></div><strong id="statKinds">0</strong><small>Jenis alat dan bahan tercatat</small></div>
+        <div class="stat"><div class="stat-top">Total jumlah barang <span class="stat-icon">▦</span></div><strong id="statQty">0</strong><small>Akumulasi seluruh kuantitas</small></div>
+        <div class="stat"><div class="stat-top">Kondisi baik <span class="stat-icon">✓</span></div><strong id="statGood">0</strong><small>Jenis inventaris berkondisi baik</small></div>
+        <div class="stat"><div class="stat-top">Perlu perhatian <span class="stat-icon">!</span></div><strong id="statAttention">0</strong><small>Rusak atau perlu diperbaiki</small></div>
+      </div>
+      <div class="split">
+        <div class="panel"><div class="panel-head"><h2>Ringkasan kondisi inventaris</h2><span class="help">Berdasarkan jenis barang</span></div><div class="panel-body" id="conditionChart"></div></div>
+        <div class="panel"><div class="panel-head"><h2>Komposisi kategori</h2></div><div class="panel-body" id="categoryChart"></div></div>
+      </div>
+      <div class="panel"><div class="panel-head"><h2>Inventaris terbaru</h2><button class="btn btn-sm" onclick="showPage('inventory')">Lihat semua →</button></div><div class="table-wrap"><table><thead><tr><th>Nama barang</th><th>Kategori</th><th>Jumlah</th><th>Kondisi</th><th>Lokasi</th></tr></thead><tbody id="recentRows"></tbody></table></div></div>
+    </section>
+    <section id="inventoryPage" class="hide">
+      <div class="pagehead"><div><h1>Data Inventaris</h1><p>Kelola data alat dan bahan laboratorium IPA.</p></div><button class="btn btn-primary" onclick="openModal()">＋ Tambah inventaris</button></div>
+      <div class="panel">
+        <div class="toolbar"><input id="searchInput" class="field search" placeholder="⌕ Cari nama barang atau lokasi..." oninput="renderInventory()"><select id="filterCategory" class="field" onchange="renderInventory()"><option value="">Semua kategori</option></select><select id="filterCondition" class="field" onchange="renderInventory()"><option value="">Semua kondisi</option><option>Baik</option><option>Perlu diperbaiki</option><option>Rusak</option></select><button class="btn" onclick="exportCSV()">↓ Ekspor CSV</button></div>
+        <div class="table-wrap"><table><thead><tr><th>Nama barang</th><th>Kategori</th><th>Jumlah</th><th>Satuan</th><th>Kondisi</th><th>Lokasi</th><th>Keterangan</th><th>Aksi</th></tr></thead><tbody id="inventoryRows"></tbody></table></div>
+        <div class="panel-body help" id="inventoryCount"></div>
+      </div>
+    </section>
+    <section id="categoriesPage" class="hide">
+      <div class="pagehead"><div><h1>Kategori Inventaris</h1><p>Kelompokkan alat dan bahan agar data lebih terstruktur.</p></div><button class="btn btn-primary" onclick="addCategory()">＋ Tambah kategori</button></div>
+      <div class="panel"><div class="panel-head"><h2>Daftar kategori</h2></div><div class="table-wrap"><table><thead><tr><th>Nama kategori</th><th>Jumlah jenis inventaris</th><th>Total barang</th><th>Aksi</th></tr></thead><tbody id="categoryRows"></tbody></table></div></div>
+    </section>
+    <section id="reportsPage" class="hide">
+      <div class="pagehead"><div><h1>Laporan Inventaris</h1><p>Rekap data inventaris keseluruhan.</p></div><button class="btn" onclick="exportCSV()">↓ Unduh data CSV</button></div>
+      <div class="report-cards" id="reportCards"></div>
+      <div class="panel" style="margin-top:20px"><div class="panel-head"><h2>Rekap inventaris</h2></div><div class="table-wrap"><table><thead><tr><th>Nama barang</th><th>Kategori</th><th>Jumlah</th><th>Kondisi</th><th>Lokasi</th><th>Terakhir diperbarui</th></tr></thead><tbody id="reportRows"></tbody></table></div></div>
+      <p class="footnote">Catatan: laporan ini merupakan rekap data yang tersimpan pada perangkat/browser yang sedang digunakan.</p>
+    </section>
+  </div>
+</main>
+</div>
+<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()"><div class="modal">
+  <div class="modal-head"><h2 id="modalTitle">Tambah inventaris</h2><button class="close" onclick="closeModal()">×</button></div>
+  <form id="itemForm">
+    <div class="modal-body"><input type="hidden" id="itemId"><div class="form-grid">
+      <div class="form-group full"><label>Nama barang *</label><input required maxlength="90" id="name" class="field" placeholder="Contoh: Mikroskop monokuler"></div>
+      <div class="form-group"><label>Kategori *</label><select required id="category" class="field"></select></div>
+      <div class="form-group"><label>Jenis *</label><select id="kind" class="field"><option>Alat</option><option>Bahan</option></select></div>
+      <div class="form-group"><label>Jumlah *</label><input required min="0" type="number" id="quantity" class="field" placeholder="0"></div>
+      <div class="form-group"><label>Satuan</label><select id="unit" class="field"><option>Unit</option><option>Buah</option><option>Set</option><option>Botol</option><option>Pack</option><option>Gram</option><option>mL</option><option>Liter</option><option>Pasang</option></select></div>
+      <div class="form-group"><label>Kondisi *</label><select id="condition" class="field"><option>Baik</option><option>Perlu diperbaiki</option><option>Rusak</option></select></div>
+      <div class="form-group"><label>Lokasi penyimpanan</label><input id="location" class="field" placeholder="Contoh: Lemari kaca A"></div>
+      <div class="form-group full"><label>Keterangan</label><textarea id="notes" class="field" rows="3" placeholder="Catatan tambahan (opsional)"></textarea></div>
+    </div><p class="help">Kolom bertanda * wajib diisi. Data disimpan di browser perangkat ini.</p></div>
+    <div class="modal-foot"><button type="button" class="btn" onclick="closeModal()">Batal</button><button type="submit" class="btn btn-primary">Simpan data</button></div>
+  </form>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+const DEFAULT_CATEGORIES=['Alat ukur','Alat optik','Alat praktikum','Bahan kimia','Bahan habis pakai','Model dan media'];
+const SEED=[
+ {id:1,name:'Mikroskop monokuler',category:'Alat optik',kind:'Alat',quantity:8,unit:'Unit',condition:'Baik',location:'Lemari alat optik',notes:'Simpan dengan penutup debu',updated:Date.now()},
+ {id:2,name:'Gelas ukur 100 mL',category:'Alat praktikum',kind:'Alat',quantity:15,unit:'Buah',condition:'Baik',location:'Lemari kaca A',notes:'',updated:Date.now()},
+ {id:3,name:'Neraca digital',category:'Alat ukur',kind:'Alat',quantity:4,unit:'Unit',condition:'Perlu diperbaiki',location:'Meja persiapan',notes:'Satu unit perlu kalibrasi',updated:Date.now()},
+ {id:4,name:'Larutan indikator universal',category:'Bahan kimia',kind:'Bahan',quantity:6,unit:'Botol',condition:'Baik',location:'Lemari bahan kimia',notes:'Periksa tanggal kedaluwarsa',updated:Date.now()},
+ {id:5,name:'Preparat awetan',category:'Alat praktikum',kind:'Alat',quantity:20,unit:'Set',condition:'Rusak',location:'Lemari preparat',notes:'Beberapa preparat retak',updated:Date.now()}
+];
+let items=JSON.parse(localStorage.getItem('labtrack_items')||'null')||SEED;
+let categories=JSON.parse(localStorage.getItem('labtrack_categories')||'null')||DEFAULT_CATEGORIES;
+function save(){localStorage.setItem('labtrack_items',JSON.stringify(items));localStorage.setItem('labtrack_categories',JSON.stringify(categories))}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function badge(c){return `<span class="badge ${c==='Baik'?'good':c==='Rusak'?'bad':c==='Perlu diperbaiki'?'warn':'neutral'}">${esc(c)}</span>`}
+function showPage(p){document.querySelectorAll('main section').forEach(s=>s.classList.add('hide'));document.getElementById(p+'Page').classList.remove('hide');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.getElementById('crumb').textContent={dashboard:'Dashboard',inventory:'Data Inventaris',categories:'Kategori',reports:'Laporan'}[p];document.getElementById('sidebar').classList.remove('open');if(p==='dashboard')renderDashboard();if(p==='inventory')renderInventory();if(p==='categories')renderCategories();if(p==='reports')renderReports()}
+document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+document.getElementById('menuBtn').onclick=()=>document.getElementById('sidebar').classList.toggle('open');
+function renderDashboard(){
+ const qty=items.reduce((a,x)=>a+Number(x.quantity),0),good=items.filter(x=>x.condition==='Baik').length,att=items.filter(x=>x.condition!=='Baik').length;
+ statKinds.textContent=items.length;statQty.textContent=qty;statGood.textContent=good;statAttention.textContent=att;
+ const cond=['Baik','Perlu diperbaiki','Rusak'],colors=['#6c9a7c','#d2a052','#c96c6c'];
+ conditionChart.innerHTML=cond.map((c,i)=>{let n=items.filter(x=>x.condition===c).length,p=items.length?n/items.length*100:0;return `<div class="bar-row"><span>${c}</span><div class="bar-track"><div class="bar-fill" style="width:${p}%;background:${colors[i]}"></div></div><b>${n}</b></div>`}).join('')+`<div class="legend">${cond.map((c,i)=>`<span><i class="dot" style="background:${colors[i]}"></i>${c}</span>`).join('')}</div>`;
+ const cats=categories.map(c=>({name:c,n:items.filter(x=>x.category===c).length})).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+ categoryChart.innerHTML=cats.length?cats.map(c=>`<div class="bar-row"><span>${esc(c.name)}</span><div class="bar-track"><div class="bar-fill" style="width:${items.length?c.n/items.length*100:0}%"></div></div><b>${c.n}</b></div>`).join(''):'<div class="empty">Belum ada data kategori.</div>';
+ recentRows.innerHTML=items.slice().sort((a,b)=>b.updated-a.updated).slice(0,5).map(x=>`<tr><td><strong>${esc(x.name)}</strong></td><td>${esc(x.category)}</td><td>${x.quantity}</td><td>${badge(x.condition)}</td><td>${esc(x.location||'-')}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Belum ada inventaris.</td></tr>';
+}
+function refreshSelects(){filterCategory.innerHTML='<option value="">Semua kategori</option>'+categories.map(c=>`<option>${esc(c)}</option>`).join('');category.innerHTML=categories.map(c=>`<option>${esc(c)}</option>`).join('')}
+function renderInventory(){
+ refreshSelects();let q=searchInput.value.toLowerCase(),cat=filterCategory.value,co=filterCondition.value;
+ let arr=items.filter(x=>(!q||(x.name+' '+x.location+' '+x.notes).toLowerCase().includes(q))&&(!cat||x.category===cat)&&(!co||x.condition===co));
+ inventoryRows.innerHTML=arr.map(x=>`<tr><td><strong>${esc(x.name)}</strong><br><span class="help">${esc(x.kind)}</span></td><td>${esc(x.category)}</td><td>${x.quantity}</td><td>${esc(x.unit)}</td><td>${badge(x.condition)}</td><td>${esc(x.location||'-')}</td><td>${esc(x.notes||'-')}</td><td><div class="actions"><button class="btn btn-sm" onclick="editItem(${x.id})">Edit</button><button class="btn btn-sm btn-danger" onclick="deleteItem(${x.id})">Hapus</button></div></td></tr>`).join('')||'<tr><td colspan="8" class="empty">Data tidak ditemukan.</td></tr>';
+ inventoryCount.textContent=`Menampilkan ${arr.length} dari ${items.length} jenis inventaris.`;
+}
+function openModal(id=null){
+ refreshSelects();itemForm.reset();itemId.value='';modalTitle.textContent=id?'Edit inventaris':'Tambah inventaris';
+ if(id){let x=items.find(a=>a.id===id);if(!x)return;itemId.value=x.id;name.value=x.name;category.value=x.category;kind.value=x.kind;quantity.value=x.quantity;unit.value=x.unit;condition.value=x.condition;location.value=x.location;notes.value=x.notes}
+ modalBackdrop.classList.add('show')
+}
+function closeModal(){modalBackdrop.classList.remove('show')}
+function editItem(id){openModal(id)}
+itemForm.addEventListener('submit',e=>{e.preventDefault();let id=Number(itemId.value),old=items.find(x=>x.id===id);let obj={id:id||Date.now(),name:name.value.trim(),category:category.value,kind:kind.value,quantity:Number(quantity.value),unit:unit.value,condition:condition.value,location:location.value.trim(),notes:notes.value.trim(),updated:Date.now()};if(old)items=items.map(x=>x.id===id?obj:x);else items.unshift(obj);save();closeModal();renderAll();toast(old?'Data inventaris diperbarui.':'Inventaris berhasil ditambahkan.')});
+function deleteItem(id){let x=items.find(a=>a.id===id);if(!x||!confirm(`Hapus "${x.name}" dari inventaris?`))return;items=items.filter(a=>a.id!==id);save();renderAll();toast('Data inventaris dihapus.')}
+function addCategory(){let v=prompt('Masukkan nama kategori baru:');if(!v)return;v=v.trim();if(!v)return;if(categories.some(c=>c.toLowerCase()===v.toLowerCase()))return toast('Kategori sudah tersedia.');categories.push(v);save();renderAll();toast('Kategori ditambahkan.')}
+function renameCategory(old){let v=prompt('Ubah nama kategori:',old);if(!v||!v.trim()||v.trim()===old)return;v=v.trim();if(categories.includes(v))return toast('Nama kategori sudah tersedia.');categories=categories.map(c=>c===old?v:c);items=items.map(x=>x.category===old?{...x,category:v,updated:Date.now()}:x);save();renderAll();toast('Kategori diperbarui.')}
+function removeCategory(c){if(items.some(x=>x.category===c))return alert('Kategori masih digunakan oleh inventaris. Pindahkan barang ke kategori lain terlebih dahulu.');if(confirm(`Hapus kategori "${c}"?`)){categories=categories.filter(x=>x!==c);save();renderAll()}}
+function renderCategories(){categoryRows.innerHTML=categories.map(c=>{let a=items.filter(x=>x.category===c);return `<tr><td><strong>${esc(c)}</strong></td><td>${a.length}</td><td>${a.reduce((s,x)=>s+Number(x.quantity),0)}</td><td><div class="actions"><button class="btn btn-sm" onclick="renameCategory('${esc(c).replace(/'/g,"\\'")}')">Ubah nama</button><button class="btn btn-sm btn-danger" onclick="removeCategory('${esc(c).replace(/'/g,"\\'")}')">Hapus</button></div></td></tr>`}).join('')}
+
+function renderReports(){
+ let arr=items;
+ reportCards.innerHTML=[['Jenis inventaris',arr.length],['Total kuantitas',arr.reduce((s,x)=>s+Number(x.quantity),0)],['Kondisi baik',arr.filter(x=>x.condition==='Baik').length]].map(x=>`<div class="report-card"><small>${x[0]}</small><strong>${x[1]}</strong></div>`).join('');
+ reportRows.innerHTML=arr.map(x=>`<tr><td><strong>${esc(x.name)}</strong></td><td>${esc(x.category)}</td><td>${x.quantity} ${esc(x.unit)}</td><td>${badge(x.condition)}</td><td>${esc(x.location||'-')}</td><td>${x.updated ? new Date(x.updated).toLocaleDateString('id-ID') : '-'}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Tidak ada data inventaris.</td></tr>';
+}
+
+function exportCSV(){let rows=[['Nama barang','Kategori','Jenis','Jumlah','Satuan','Kondisi','Lokasi','Keterangan'],...items.map(x=>[x.name,x.category,x.kind,x.quantity,x.unit,x.condition,x.location,x.notes])];let csv='\ufeff'+rows.map(r=>r.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\n');let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));a.download='inventaris-laboratorium-ipa.csv';a.click();URL.revokeObjectURL(a.href)}
+function toast(t){let el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2400)}
+function renderAll(){renderDashboard();renderInventory();renderCategories();renderReports()}
+
+// SYSTEM AUTENTIKASI DENGAN AKUN LOKAL
+const DEFAULT_USERS = [
+  { fullname: 'Laboran', username: 'laboran', password: 'labipa123' }
+];
+
+function getUsers() {
+  return JSON.parse(localStorage.getItem('labdata_users') || 'null') || DEFAULT_USERS;
+}
+
+function saveUsers(users) {
+  localStorage.setItem('labdata_users', JSON.stringify(users));
+}
+
+const loginScreen = document.getElementById('loginScreen');
+const loginForm = document.getElementById('loginForm');
+const registerForm = document.getElementById('registerForm');
+const loginError = document.getElementById('loginError');
+const regError = document.getElementById('regError');
+const regSuccess = document.getElementById('regSuccess');
+
+function switchAuthTab(type) {
+  loginError.style.display = 'none';
+  regError.style.display = 'none';
+  regSuccess.style.display = 'none';
+  if (type === 'login') {
+    document.getElementById('tabLogin').classList.add('active');
+    document.getElementById('tabRegister').classList.remove('active');
+    document.getElementById('loginSection').classList.remove('hide');
+    document.getElementById('registerSection').classList.add('hide');
+  } else {
+    document.getElementById('tabRegister').classList.add('active');
+    document.getElementById('tabLogin').classList.remove('active');
+    document.getElementById('registerSection').classList.remove('hide');
+    document.getElementById('loginSection').classList.add('hide');
+  }
+}
+
+function checkLogin() {
+  const currentUser = JSON.parse(sessionStorage.getItem('labdata_user_session') || 'null');
+  if (currentUser) {
+    loginScreen.style.display = 'none';
+    document.getElementById('userNameDisplay').textContent = currentUser.fullname;
+    document.getElementById('userAvatar').textContent = currentUser.fullname.charAt(0).toUpperCase();
+  } else {
+    loginScreen.style.display = 'flex';
+  }
+}
+
+// LOGIKA LOGIN
+loginForm.addEventListener('submit', function(event) {
+  event.preventDefault();
+  const usernameInput = document.getElementById('loginUsername').value.trim();
+  const passwordInput = document.getElementById('loginPassword').value;
+  
+  const users = getUsers();
+  const matchedUser = users.find(u => u.username.toLowerCase() === usernameInput.toLowerCase() && u.password === passwordInput);
+  
+  if (matchedUser) {
+    sessionStorage.setItem('labdata_user_session', JSON.stringify(matchedUser));
+    loginError.style.display = 'none';
+    loginForm.reset();
+    checkLogin();
+  } else {
+    loginError.style.display = 'block';
+  }
+});
+
+// LOGIKA BUAT AKUN (REGISTRASI)
+registerForm.addEventListener('submit', function(event) {
+  event.preventDefault();
+  const fullname = document.getElementById('regFullName').value.trim();
+  const username = document.getElementById('regUsername').value.trim();
+  const password = document.getElementById('regPassword').value;
+
+  const users = getUsers();
+  const isExist = users.some(u => u.username.toLowerCase() === username.toLowerCase());
+
+  if (isExist) {
+    regError.textContent = 'Username sudah digunakan. Pilih username lain.';
+    regError.style.display = 'block';
+    regSuccess.style.display = 'none';
+    return;
+  }
+
+  users.push({ fullname, username, password });
+  saveUsers(users);
+
+  regError.style.display = 'none';
+  regSuccess.style.display = 'block';
+  registerForm.reset();
+
+  setTimeout(() => {
+    switchAuthTab('login');
+    document.getElementById('loginUsername').value = username;
+  }, 1500);
+});
+
+// LOGIKA LOGOUT
+document.getElementById('logoutBtn').addEventListener('click', function() {
+  sessionStorage.removeItem('labdata_user_session');
+  checkLogin();
+});
+
+checkLogin();
+refreshSelects();
+renderAll();
+</script>
+</body>
+</html>
+
