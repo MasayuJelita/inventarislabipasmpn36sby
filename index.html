@@ -133,7 +133,7 @@
       </div>
     </section>
     <section id="categoriesPage" class="hide">
-      <div class="pagehead"><div><h1>Kategori Inventaris</h1><p>Kelompokkan alat dan bahan agar data lebih terstruktur.</p></div><button class="btn btn-primary" onclick="addCategory()">＋ Tambah kategori</button></div>
+      <div class="pagehead"><div><h1>Kategori Inventaris</h1><p>Kelompokkan alat dan bahan agar data lebih terstruktur.</p></div><button class="btn btn-primary" onclick="openCategoryModal()">＋ Tambah kategori</button></div>
       <div class="panel"><div class="panel-head"><h2>Daftar kategori</h2></div><div class="table-wrap"><table><thead><tr><th>Nama kategori</th><th>Jumlah jenis inventaris</th><th>Total barang</th><th>Aksi</th></tr></thead><tbody id="categoryRows"></tbody></table></div></div>
     </section>
     <section id="reportsPage" class="hide">
@@ -151,6 +151,7 @@
     <div class="modal-body"><input type="hidden" id="itemId"><div class="form-grid">
       <div class="form-group full"><label>Nama barang *</label><input required maxlength="90" id="name" class="field" placeholder="Contoh: Mikroskop monokuler"></div>
       <div class="form-group"><label>Kategori *</label><select required id="category" class="field"></select></div>
+      <div class="form-group hide" id="newCategoryGroup"><label>Kategori baru *</label><input id="newCategory" class="field" maxlength="60" placeholder="Contoh: Alat keselamatan"></div>
       <div class="form-group"><label>Jenis *</label><select id="kind" class="field"><option>Alat</option><option>Bahan</option></select></div>
       <div class="form-group"><label>Jumlah *</label><input required min="0" type="number" id="quantity" class="field" placeholder="0"></div>
       <div class="form-group"><label>Satuan</label><select id="unit" class="field"><option>Unit</option><option>Buah</option><option>Set</option><option>Botol</option><option>Pack</option><option>Gram</option><option>mL</option><option>Liter</option><option>Pasang</option></select></div>
@@ -163,6 +164,10 @@
   </form>
 </div></div>
 <div class="toast" id="toast"></div>
+<div class="modal-backdrop" id="categoryModalBackdrop" onclick="if(event.target===this)closeCategoryModal()"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="categoryModalTitle">
+  <div class="modal-head"><h2 id="categoryModalTitle">Tambah kategori</h2><button class="close" type="button" onclick="closeCategoryModal()">×</button></div>
+  <form id="categoryForm"><div class="modal-body"><div class="form-group"><label for="categoryName">Nama kategori *</label><input id="categoryName" class="field" maxlength="60" required placeholder="Contoh: Alat keselamatan"></div><p class="help">Kategori baru akan tersedia pada formulir inventaris.</p><div id="categorySaveError" class="login-error" role="alert" style="display:none;margin:0 0 12px"></div></div><div class="modal-foot"><button type="button" class="btn" onclick="closeCategoryModal()">Batal</button><button type="submit" class="btn btn-primary">Simpan kategori</button></div></form>
+</div></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
 const SUPABASE_URL = 'https://uyqjtwwpyifdboayvzfn.supabase.co';
@@ -190,6 +195,7 @@ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 function badge(c){return `<span class="badge ${c==='Baik'?'good':c==='Rusak'?'bad':c==='Perlu diperbaiki'?'warn':'neutral'}">${esc(c)}</span>`}
 function showPage(p){document.querySelectorAll('main section').forEach(s=>s.classList.add('hide'));document.getElementById(p+'Page').classList.remove('hide');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===p));document.getElementById('crumb').textContent={dashboard:'Dashboard',inventory:'Data Inventaris',categories:'Kategori',reports:'Laporan'}[p];document.getElementById('sidebar').classList.remove('open');if(p==='dashboard')renderDashboard();if(p==='inventory')renderInventory();if(p==='categories')renderCategories();if(p==='reports')renderReports()}
 document.querySelectorAll('.nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+category.addEventListener('change',toggleNewCategory);
 document.getElementById('menuBtn').onclick=()=>document.getElementById('sidebar').classList.toggle('open');
 function renderDashboard(){
  const qty=items.reduce((a,x)=>a+Number(x.quantity),0),good=items.filter(x=>x.condition==='Baik').length,att=items.filter(x=>x.condition!=='Baik').length;
@@ -200,7 +206,8 @@ function renderDashboard(){
  categoryChart.innerHTML=cats.length?cats.map(c=>`<div class="bar-row"><span>${esc(c.name)}</span><div class="bar-track"><div class="bar-fill" style="width:${items.length?c.n/items.length*100:0}%"></div></div><b>${c.n}</b></div>`).join(''):'<div class="empty">Belum ada data kategori.</div>';
  recentRows.innerHTML=items.slice().sort((a,b)=>b.updated-a.updated).slice(0,5).map(x=>`<tr><td><strong>${esc(x.name)}</strong></td><td>${esc(x.category)}</td><td>${x.quantity}</td><td>${badge(x.condition)}</td><td>${esc(x.location||'-')}</td></tr>`).join('')||'<tr><td colspan="5" class="empty">Belum ada inventaris.</td></tr>';
 }
-function refreshSelects(){filterCategory.innerHTML='<option value="">Semua kategori</option>'+categories.map(c=>`<option>${esc(c)}</option>`).join('');category.innerHTML=categories.map(c=>`<option>${esc(c)}</option>`).join('')}
+function refreshSelects(){filterCategory.innerHTML='<option value="">Semua kategori</option>'+categories.map(c=>`<option>${esc(c)}</option>`).join('');category.innerHTML=categories.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')+'<option value="__other__">Lainnya…</option>';toggleNewCategory()}
+function toggleNewCategory(){const isOther=category.value==='__other__';newCategoryGroup.classList.toggle('hide',!isOther);newCategory.required=isOther;if(!isOther)newCategory.value=''}
 function renderInventory(){
  refreshSelects();let q=searchInput.value.toLowerCase(),cat=filterCategory.value,co=filterCondition.value;
  let arr=items.filter(x=>(!q||(x.name+' '+x.location+' '+x.notes).toLowerCase().includes(q))&&(!cat||x.category===cat)&&(!co||x.condition===co));
@@ -208,8 +215,8 @@ function renderInventory(){
  inventoryCount.textContent=`Menampilkan ${arr.length} dari ${items.length} jenis inventaris.`;
 }
 function openModal(id=null){
- refreshSelects();itemForm.reset();itemId.value='';modalTitle.textContent=id?'Edit inventaris':'Tambah inventaris';
- if(id){let x=items.find(a=>a.id===id);if(!x)return;itemId.value=x.id;name.value=x.name;category.value=x.category;kind.value=x.kind;quantity.value=x.quantity;unit.value=x.unit;condition.value=x.condition;location.value=x.location;notes.value=x.notes}
+ refreshSelects();itemForm.reset();itemId.value='';modalTitle.textContent=id?'Edit inventaris':'Tambah inventaris';toggleNewCategory();
+ if(id){let x=items.find(a=>a.id===id);if(!x)return;if(!categories.includes(x.category)){const option=document.createElement('option');option.value=x.category;option.textContent=x.category;category.insertBefore(option,category.lastElementChild)}itemId.value=x.id;name.value=x.name;category.value=x.category;kind.value=x.kind;quantity.value=x.quantity;unit.value=x.unit;condition.value=x.condition;location.value=x.location;notes.value=x.notes;toggleNewCategory()}
  modalBackdrop.classList.add('show')
 }
 function closeModal(){modalBackdrop.classList.remove('show')}
@@ -225,9 +232,15 @@ itemForm.addEventListener('submit',async e=>{
   const {data:{session}}=await supabaseClient.auth.getSession();
   if(!session)throw new Error('Sesi masuk tidak ditemukan. Keluar lalu masuk kembali.');
   const id=Number(itemId.value),old=items.find(x=>x.id===id);
-  const obj={id:id||Date.now(),name:document.getElementById('name').value.trim(),category:document.getElementById('category').value,kind:document.getElementById('kind').value,quantity:Number(document.getElementById('quantity').value),unit:document.getElementById('unit').value,condition:document.getElementById('condition').value,location:document.getElementById('location').value.trim(),notes:document.getElementById('notes').value.trim(),updated:Date.now()};
+  let chosenCategory=document.getElementById('category').value;
+  if(chosenCategory==='__other__'){chosenCategory=document.getElementById('newCategory').value.trim();if(!chosenCategory)throw new Error('Masukkan nama kategori baru.')}
+  const existingCategory=categories.find(c=>c.toLowerCase()===chosenCategory.toLowerCase());
+  const isNewCategory=!existingCategory;chosenCategory=existingCategory||chosenCategory;
+  if(isNewCategory){const {error:categoryError}=await supabaseClient.from('inventory_categories').upsert({name:chosenCategory});if(categoryError)throw categoryError}
+  const obj={id:id||Date.now(),name:document.getElementById('name').value.trim(),category:chosenCategory,kind:document.getElementById('kind').value,quantity:Number(document.getElementById('quantity').value),unit:document.getElementById('unit').value,condition:document.getElementById('condition').value,location:document.getElementById('location').value.trim(),notes:document.getElementById('notes').value.trim(),updated:Date.now()};
   const {error}=await supabaseClient.from('inventory_items').upsert({id:obj.id,name:obj.name,category:obj.category,kind:obj.kind,quantity:obj.quantity,unit:obj.unit,condition:obj.condition,location:obj.location,notes:obj.notes,updated:obj.updated});
   if(error)throw error;
+  if(isNewCategory)categories.push(chosenCategory);
   if(old)items=items.map(x=>x.id===id?obj:x);else items.unshift(obj);
   closeModal();renderAll();toast(old?'Data inventaris berhasil diperbarui.':'Inventaris berhasil disimpan ke database.');
  }catch(error){
@@ -235,7 +248,9 @@ itemForm.addEventListener('submit',async e=>{
  }finally{submitButton.disabled=false;submitButton.textContent=originalText;}
 });
 function deleteItem(id){let x=items.find(a=>a.id===id);if(!x||!confirm(`Hapus "${x.name}" dari inventaris?`))return;items=items.filter(a=>a.id!==id);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Data inventaris dihapus.')}
-function addCategory(){let v=prompt('Masukkan nama kategori baru:');if(!v)return;v=v.trim();if(!v)return;if(categories.some(c=>c.toLowerCase()===v.toLowerCase()))return toast('Kategori sudah tersedia.');categories.push(v);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Kategori ditambahkan.')}
+function openCategoryModal(){categoryForm.reset();categorySaveError.style.display='none';categorySaveError.textContent='';categoryModalBackdrop.classList.add('show');categoryName.focus()}
+function closeCategoryModal(){categoryModalBackdrop.classList.remove('show')}
+categoryForm.addEventListener('submit',async e=>{e.preventDefault();const value=categoryName.value.trim();if(!value)return;const existing=categories.some(c=>c.toLowerCase()===value.toLowerCase());if(existing){categorySaveError.textContent='Kategori tersebut sudah tersedia.';categorySaveError.style.display='block';return}const button=categoryForm.querySelector('button[type="submit"]');button.disabled=true;try{if(!supabaseClient)throw new Error('Koneksi database belum aktif.');const {data:{session}}=await supabaseClient.auth.getSession();if(!session)throw new Error('Silakan masuk kembali sebelum menambahkan kategori.');const {error}=await supabaseClient.from('inventory_categories').upsert({name:value});if(error)throw error;categories.push(value);closeCategoryModal();renderAll();toast('Kategori ditambahkan.')}catch(error){categorySaveError.textContent='Gagal menyimpan: '+(error?.message||String(error));categorySaveError.style.display='block'}finally{button.disabled=false}})
 function renameCategory(old){let v=prompt('Ubah nama kategori:',old);if(!v||!v.trim()||v.trim()===old)return;v=v.trim();if(categories.includes(v))return toast('Nama kategori sudah tersedia.');categories=categories.map(c=>c===old?v:c);items=items.map(x=>x.category===old?{...x,category:v,updated:Date.now()}:x);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll();toast('Kategori diperbarui.')}
 function removeCategory(c){if(items.some(x=>x.category===c))return alert('Kategori masih digunakan oleh inventaris. Pindahkan barang ke kategori lain terlebih dahulu.');if(confirm(`Hapus kategori "${c}"?`)){categories=categories.filter(x=>x!==c);save().catch(e=>toast('Gagal menyimpan: '+e.message));renderAll()}}
 function renderCategories(){categoryRows.innerHTML=categories.map(c=>{let a=items.filter(x=>x.category===c);return `<tr><td><strong>${esc(c)}</strong></td><td>${a.length}</td><td>${a.reduce((s,x)=>s+Number(x.quantity),0)}</td><td><div class="actions"><button class="btn btn-sm" onclick="renameCategory('${esc(c).replace(/'/g,"\\'")}')">Ubah nama</button><button class="btn btn-sm btn-danger" onclick="removeCategory('${esc(c).replace(/'/g,"\\'")}')">Hapus</button></div></td></tr>`}).join('')}
@@ -273,5 +288,4 @@ refreshSelects();renderAll();
 </script>
 </body>
 </html>
-
 
